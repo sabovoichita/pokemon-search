@@ -51,7 +51,13 @@ const displayPokemonData = (data) => {
   spriteContainer.innerHTML = data.sprites?.front_default
     ? `<img id="sprite" src="${data.sprites.front_default}" alt="${data.name} front default sprite">`
     : `<p>No sprite available</p>`;
-  types.textContent = `Types: ${data.types.map((t) => t.type.name).join(", ")}`;
+
+  types.innerHTML = "";
+  data.types.forEach((typeInfo) => {
+    const typeElement = document.createElement("div");
+    typeElement.textContent = typeInfo.type.name.toUpperCase();
+    types.appendChild(typeElement);
+  });
 
   if (data.stats) {
     hp.textContent = `${data.stats[0]?.base_stat || "N/A"}`;
