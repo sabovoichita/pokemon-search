@@ -82,45 +82,61 @@ API_DATA = {
     },
   ],
 };
-
 const fetchData = async () => {
   try {
-    const res = await fetch(pokemonAPI);
+    const pokemonNameOrId = searchInput.value.trim().toLowerCase();
+    const res = await fetch(`${pokemonAPI}/${pokemonNameOrId}`);
+    if (!res.ok) throw new Error("Pokémon not found in API.");
     const data = await res.json();
-
-    // console.log(data);
-    return data.results;
+    return data;
   } catch (err) {
     console.log("Using mock data due to API error.");
-    return API_DATA.results; // Fallback to mock data
+    return API_DATA.results;
   }
 };
 
 const searchPokemon = async () => {
   const searchTerm = searchInput.value.trim().toLowerCase();
   if (!searchTerm) {
-    console.log("Please enter a Pokemon name or ID.");
+    console.log("Please enter a Pokémon name or ID.");
     return;
   }
 
-  const pokemonList = await fetchData();
+  const data = await fetchData();
 
-  const foundPokemon = pokemonList.find(
-    (pokemon) => pokemon.name || String(pokemon.id) === searchTerm
-  );
-  if (foundPokemon) {
-    console.log("Pokémon Found:");
-    console.log(`Name: ${foundPokemon.name}`);
-    console.log(`ID: ${foundPokemon.id}`);
-    console.log(`URL: ${foundPokemon.url}`);
+  if (Array.isArray(data)) {
+    const foundPokemon = data.find(
+      (pokemon) =>
+        pokemon.name === searchTerm || String(pokemon.id) === searchTerm
+    );
+
+    if (foundPokemon) {
+      console.log("Pokémon Found (Mock Data):");
+      console.log(`Name: ${foundPokemon.name}`);
+      console.log(`ID: ${foundPokemon.id}`);
+      console.log(`URL: ${foundPokemon.url}`);
+
+      pokemonName.textContent = `Name: ${foundPokemon.name}`;
+      pokemonId.textContent = `ID: ${foundPokemon.id}`;
+      weight.textContent = "Weight: N/A";
+      height.textContent = "Height: N/A";
+    } else {
+      console.log("No Pokémon found with that name or ID.");
+      pokemonName.textContent = "Name: Not Found";
+      pokemonId.textContent = "";
+    }
   } else {
-    console.log("No Pokémon found with that name or ID.");
+    console.log("Pokémon Found (API Data):");
+    console.log(data);
+
+    pokemonName.textContent = `Name: ${data.name}`;
+    pokemonId.textContent = `ID: ${data.id}`;
+    weight.textContent = `Weight: ${data.weight}`;
+    height.textContent = `Height: ${data.height}`;
   }
 };
 
 searchForm.addEventListener("submit", (e) => {
   e.preventDefault();
   searchPokemon();
-  console.log(e);
-  //   getPokemon();
 });
