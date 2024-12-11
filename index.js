@@ -15,82 +15,86 @@ const speed = document.querySelector("#speed");
 
 const pokemonAPI = "https://pokeapi-proxy.freecodecamp.rocks/api/pokemon";
 
+const reset = () => {
+  pokemonName.textContent = "";
+  pokemonId.textContent = "";
+  weight.textContent = "";
+  height.textContent = "";
+  spriteContainer.innerHTML = "";
+  types.innerHTML = "";
+  hp.textContent = "";
+  attack.textContent = "";
+  defense.textContent = "";
+  specialAttack.textContent = "";
+  specialDefense.textContent = "";
+  speed.textContent = "";
+};
+
 const fetchPokemonData = async (searchTerm) => {
   try {
     const response = await fetch(`${pokemonAPI}/${searchTerm}`);
     if (!response.ok) {
       throw new Error("Pokémon not found.");
     }
-    const data = await response.json();
-    return data;
+    return await response.json();
   } catch (error) {
-    alert(error.message);
     console.error("An error occurred:", error.message);
     return null;
   }
 };
 
-const displayPokemonData = (data) => {
-  if (!data) {
-    pokemonName.textContent = "Name: Not Found";
-    pokemonId.textContent = "";
-    spriteContainer.innerHTML = `<p>No sprite available</p>`;
-    weight.textContent = "Weight: N/A";
-    height.textContent = "Height: N/A";
-    types.textContent = "Types: N/A";
-    hp.textContent = "HP: N/A";
-    attack.textContent = "Attack: N/A";
-    defense.textContent = "Defense: N/A";
-    specialAttack.textContent = "Special Attack: N/A";
-    specialDefense.textContent = "Special Defense: N/A";
-    speed.textContent = "Speed: N/A";
-    return;
-  }
-
-  pokemonName.textContent = `${data.name}`;
+const pokemonDetails = (data) => {
+  pokemonName.textContent = data.name.toUpperCase();
   pokemonId.textContent = `#${data.id}`;
-  weight.textContent = `Weight: ${data.weight}`;
-  height.textContent = `Height: ${data.height}`;
+  weight.textContent = `${data.weight}`;
+  height.textContent = `${data.height}`;
   spriteContainer.innerHTML = data.sprites?.front_default
     ? `<img id="sprite" src="${data.sprites.front_default}" alt="${data.name} front default sprite">`
     : `<p>No sprite available</p>`;
+};
 
+const displayTypes = (data) => {
   types.innerHTML = "";
   data.types.forEach((typeInfo) => {
     const typeElement = document.createElement("div");
     typeElement.textContent = typeInfo.type.name.toUpperCase();
     types.appendChild(typeElement);
   });
+};
 
-  if (data.stats) {
-    hp.textContent = `${data.stats[0]?.base_stat || "N/A"}`;
-    attack.textContent = `${data.stats[1]?.base_stat || "N/A"}`;
-    defense.textContent = `${data.stats[2]?.base_stat || "N/A"}`;
-    specialAttack.textContent = `${data.stats[3]?.base_stat || "N/A"}`;
-    specialDefense.textContent = `${data.stats[4]?.base_stat || "N/A"}`;
-    speed.textContent = `${data.stats[5]?.base_stat || "N/A"}`;
-  } else {
-    hp.textContent = "HP: N/A";
-    attack.textContent = "Attack: N/A";
-    defense.textContent = "Defense: N/A";
-    specialAttack.textContent = "Special Attack: N/A";
-    specialDefense.textContent = "Special Defense: N/A";
-    speed.textContent = "Speed: N/A";
-  }
+const displayStats = (data) => {
+  hp.textContent = `${data.stats[0]?.base_stat || ""}`;
+  attack.textContent = `${data.stats[1]?.base_stat || ""}`;
+  defense.textContent = `${data.stats[2]?.base_stat || ""}`;
+  specialAttack.textContent = `${data.stats[3]?.base_stat || ""}`;
+  specialDefense.textContent = `${data.stats[4]?.base_stat || ""}`;
+  speed.textContent = `${data.stats[5]?.base_stat || ""}`;
 };
 
 const searchPokemon = async () => {
   const searchTerm = searchInput.value.trim().toLowerCase();
   if (!searchTerm) {
-    console.log("Please enter a Pokémon name or ID.");
+    alert("Please enter a Pokémon name or ID.");
     return;
   }
 
   const data = await fetchPokemonData(searchTerm);
-  displayPokemonData(data);
+
+  if (data) {
+    pokemonDetails(data);
+    displayTypes(data);
+    displayStats(data);
+  } else {
+    reset();
+    alert("Pokémon not found.");
+  }
 };
 
-searchForm.addEventListener("submit", (e) => {
-  e.preventDefault();
-  searchPokemon();
-});
+const initEvents = () => {
+  searchForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    searchPokemon();
+  });
+};
+
+initEvents();
