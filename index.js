@@ -1,6 +1,5 @@
 const searchForm = document.querySelector("#search-form");
 const searchInput = document.querySelector("#search-input");
-const searchButton = document.querySelector("#search-button");
 const pokemonName = document.querySelector("#pokemon-name");
 const pokemonId = document.querySelector("#pokemon-id");
 const spriteContainer = document.querySelector("#sprite-container");
@@ -16,74 +15,58 @@ const speed = document.querySelector("#speed");
 
 const pokemonAPI = "https://pokeapi-proxy.freecodecamp.rocks/api/pokemon";
 
-const pokemonNameOrId = searchInput.value.toLowerCase();
-
-API_DATA = {
-  count: 1302,
-  results: [
-    {
-      id: 1,
-      name: "bulbasaur",
-      url: "https://pokeapi-proxy.freecodecamp.rocks/api/pokemon/1/",
-    },
-    {
-      id: 2,
-      name: "ivysaur",
-      url: "https://pokeapi-proxy.freecodecamp.rocks/api/pokemon/2/",
-    },
-    {
-      id: 3,
-      name: "venusaur",
-      url: "https://pokeapi-proxy.freecodecamp.rocks/api/pokemon/3/",
-    },
-    {
-      id: 4,
-      name: "charmander",
-      url: "https://pokeapi-proxy.freecodecamp.rocks/api/pokemon/4/",
-    },
-    {
-      id: 5,
-      name: "charmeleon",
-      url: "https://pokeapi-proxy.freecodecamp.rocks/api/pokemon/5/",
-    },
-    {
-      id: 6,
-      name: "charizard",
-      url: "https://pokeapi-proxy.freecodecamp.rocks/api/pokemon/6/",
-    },
-    {
-      id: 7,
-      name: "squirtle",
-      url: "https://pokeapi-proxy.freecodecamp.rocks/api/pokemon/7/",
-    },
-    {
-      id: 8,
-      name: "wartortle",
-      url: "https://pokeapi-proxy.freecodecamp.rocks/api/pokemon/8/",
-    },
-    {
-      id: 9,
-      name: "blastoise",
-      url: "https://pokeapi-proxy.freecodecamp.rocks/api/pokemon/9/",
-    },
-    {
-      id: 10,
-      name: "caterpie",
-      url: "https://pokeapi-proxy.freecodecamp.rocks/api/pokemon/10/",
-    },
-  ],
+const fetchPokemonData = async (searchTerm) => {
+  try {
+    const response = await fetch(`${pokemonAPI}/${searchTerm}`);
+    if (!response.ok) alert("Pokémon not found");
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error(error.message);
+    return null;
+  }
 };
 
-const fetchData = async () => {
-  try {
-    const pokemonNameOrId = searchInput.value.trim().toLowerCase();
-    const res = await fetch(`${pokemonAPI}/${pokemonNameOrId}`);
-    if (!res.ok) throw new Error("Pokémon not found in API.");
-    const data = await res.json();
-    return data;
-  } catch (err) {
-    console.log("Using mock data due to API error.");
-    return API_DATA.results;
+const displayPokemonData = (data) => {
+  if (!data) {
+    pokemonName.textContent = "Name: Not Found";
+    pokemonId.textContent = "";
+    spriteContainer.innerHTML = `<p>No sprite available</p>`;
+    weight.textContent = "Weight: N/A";
+    height.textContent = "Height: N/A";
+    types.textContent = "Types: N/A";
+    hp.textContent = "HP: N/A";
+    attack.textContent = "Attack: N/A";
+    defense.textContent = "Defense: N/A";
+    specialAttack.textContent = "Special Attack: N/A";
+    specialDefense.textContent = "Special Defense: N/A";
+    speed.textContent = "Speed: N/A";
+    return;
+  }
+
+  pokemonName.textContent = `${data.name}`;
+  pokemonId.textContent = `#${data.id}`;
+  weight.textContent = `Weight: ${data.weight}`;
+  height.textContent = `Height: ${data.height}`;
+  spriteContainer.innerHTML = data.sprites?.front_default
+    ? `<img id="sprite" src="${data.sprites.front_default}" alt="${data.name} front default sprite">`
+    : `<p>No sprite available</p>`;
+  types.textContent = `Types: ${data.types.map((t) => t.type.name).join(", ")}`;
+
+  if (data.stats) {
+    hp.textContent = `${data.stats[0]?.base_stat || "N/A"}`;
+    attack.textContent = `${data.stats[1]?.base_stat || "N/A"}`;
+    defense.textContent = `${data.stats[2]?.base_stat || "N/A"}`;
+    specialAttack.textContent = `${data.stats[3]?.base_stat || "N/A"}`;
+    specialDefense.textContent = `${data.stats[4]?.base_stat || "N/A"}`;
+    speed.textContent = `${data.stats[5]?.base_stat || "N/A"}`;
+  } else {
+    hp.textContent = "HP: N/A";
+    attack.textContent = "Attack: N/A";
+    defense.textContent = "Defense: N/A";
+    specialAttack.textContent = "Special Attack: N/A";
+    specialDefense.textContent = "Special Defense: N/A";
+    speed.textContent = "Speed: N/A";
   }
 };
 
@@ -94,44 +77,8 @@ const searchPokemon = async () => {
     return;
   }
 
-  const data = await fetchData();
-
-  if (Array.isArray(data)) {
-    const foundPokemon = data.find(
-      (pokemon) =>
-        pokemon.name === searchTerm || String(pokemon.id) === searchTerm
-    );
-
-    if (foundPokemon) {
-      console.log("Pokémon Found (Mock Data):");
-      console.log(`Name: ${foundPokemon.name}`);
-      console.log(`ID: ${foundPokemon.id}`);
-      console.log(`URL: ${foundPokemon.url}`);
-
-      pokemonName.textContent = `Name: ${foundPokemon.name}`;
-      pokemonId.textContent = `ID: ${foundPokemon.id}`;
-      spriteContainer.innerHTML = `
-          <img id="sprite" src="placeholder.png" alt="${foundPokemon.name} (Mock Image)">
-        `;
-      weight.textContent = "Weight: N/A";
-      height.textContent = "Height: N/A";
-    } else {
-      console.log("No Pokémon found with that name or ID.");
-      pokemonName.textContent = "Name: Not Found";
-      pokemonId.textContent = "";
-      spriteContainer.innerHTML = "";
-    }
-  } else {
-    console.log("Pokémon Found (API Data):", data);
-
-    pokemonName.textContent = `Name: ${data.name}`;
-    pokemonId.textContent = `ID: ${data.id}`;
-    weight.textContent = `Weight: ${data.weight}`;
-    height.textContent = `Height: ${data.height}`;
-    spriteContainer.innerHTML = `
-        <img id="sprite" src="${data.sprites.front_default}" alt="${data.name} front default sprite">
-      `;
-  }
+  const data = await fetchPokemonData(searchTerm);
+  displayPokemonData(data);
 };
 
 searchForm.addEventListener("submit", (e) => {
