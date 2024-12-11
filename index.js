@@ -47,8 +47,8 @@ const fetchPokemonData = async (searchTerm) => {
 const pokemonDetails = (data) => {
   pokemonName.textContent = data.name.toUpperCase();
   pokemonId.textContent = `#${data.id}`;
-  weight.textContent = `${data.weight}`;
-  height.textContent = `${data.height}`;
+  weight.textContent = `Weight: ${data.weight}`;
+  height.textContent = `Height: ${data.height}`;
   spriteContainer.innerHTML = data.sprites?.front_default
     ? `<img id="sprite" src="${data.sprites.front_default}" alt="${data.name} front default sprite">`
     : `<p>No sprite available</p>`;
