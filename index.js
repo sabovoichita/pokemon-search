@@ -18,11 +18,14 @@ const pokemonAPI = "https://pokeapi-proxy.freecodecamp.rocks/api/pokemon";
 const fetchPokemonData = async (searchTerm) => {
   try {
     const response = await fetch(`${pokemonAPI}/${searchTerm}`);
-    if (!response.ok) alert("Pokémon not found");
+    if (!response.ok) {
+      throw new Error("Pokémon not found.");
+    }
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error(error.message);
+    alert(error.message);
+    console.error("An error occurred:", error.message);
     return null;
   }
 };
