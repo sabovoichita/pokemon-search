@@ -13,3 +13,28 @@ const defense = document.querySelector("#defense");
 const specialAttack = document.querySelector("#special-attack");
 const specialDefense = document.querySelector("#special-defense");
 const speed = document.querySelector("#speed");
+
+//see a list of all valid Pokémon names, id numbers, and URLs
+const pokemonAPI = "https://pokeapi-proxy.freecodecamp.rocks/api/pokemon";
+
+//where {name-or-id} is the Pokémon's name or id number.
+const pokemonNameOrId =
+  "https://pokeapi-proxy.freecodecamp.rocks/api/pokemon/{name-or-id}";
+// Note: Pokémon names should be in lowercase,
+// have special characters removed,
+// and be dash separated.
+// Also, if the Pokémon has either ♀ or ♂ as part of its name,
+// the format is {name-f} or {name-m}, respectively.
+
+const fetchData = async () => {
+  try {
+    const res = await fetch(pokemonAPI);
+    const data = await res.json();
+
+    console.log(data);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+fetchData();
