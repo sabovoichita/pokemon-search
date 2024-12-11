@@ -34,10 +34,11 @@ const fetchPokemonData = async (searchTerm) => {
   try {
     const response = await fetch(`${pokemonAPI}/${searchTerm}`);
     if (!response.ok) {
-      throw new Error("Pokémon not found.");
+      throw new Error("Pokémon not found");
     }
     return await response.json();
   } catch (error) {
+    alert("Pokémon not found");
     console.error("An error occurred:", error.message);
     return null;
   }
