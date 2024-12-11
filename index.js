@@ -14,18 +14,9 @@ const specialAttack = document.querySelector("#special-attack");
 const specialDefense = document.querySelector("#special-defense");
 const speed = document.querySelector("#speed");
 
-//see a list of all valid Pokémon names, id numbers, and URLs
 const pokemonAPI = "https://pokeapi-proxy.freecodecamp.rocks/api/pokemon";
 
-//where {name-or-id} is the Pokémon's name or id number.
-
 const pokemonNameOrId = searchInput.value.toLowerCase();
-
-// Note: Pokémon names should be in lowercase,
-// have special characters removed,
-// and be dash separated.
-// Also, if the Pokémon has either ♀ or ♂ as part of its name,
-// the format is {name-f} or {name-m}, respectively.
 
 API_DATA = {
   count: 1302,
@@ -82,6 +73,7 @@ API_DATA = {
     },
   ],
 };
+
 const fetchData = async () => {
   try {
     const pokemonNameOrId = searchInput.value.trim().toLowerCase();
@@ -118,21 +110,27 @@ const searchPokemon = async () => {
 
       pokemonName.textContent = `Name: ${foundPokemon.name}`;
       pokemonId.textContent = `ID: ${foundPokemon.id}`;
+      spriteContainer.innerHTML = `
+          <img id="sprite" src="placeholder.png" alt="${foundPokemon.name} (Mock Image)">
+        `;
       weight.textContent = "Weight: N/A";
       height.textContent = "Height: N/A";
     } else {
       console.log("No Pokémon found with that name or ID.");
       pokemonName.textContent = "Name: Not Found";
       pokemonId.textContent = "";
+      spriteContainer.innerHTML = "";
     }
   } else {
-    console.log("Pokémon Found (API Data):");
-    console.log(data);
+    console.log("Pokémon Found (API Data):", data);
 
     pokemonName.textContent = `Name: ${data.name}`;
     pokemonId.textContent = `ID: ${data.id}`;
     weight.textContent = `Weight: ${data.weight}`;
     height.textContent = `Height: ${data.height}`;
+    spriteContainer.innerHTML = `
+        <img id="sprite" src="${data.sprites.front_default}" alt="${data.name} front default sprite">
+      `;
   }
 };
 
